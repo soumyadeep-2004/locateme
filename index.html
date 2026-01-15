@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>LocateME</title>
+
+  <!-- Leaflet -->
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet/dist/leaflet.css"
+  />
+
+  <!-- Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- MAP -->
+  <div id="map"></div>
+
+  <!-- TOP LEFT BRAND + SEARCH -->
+  <div class="top-left">
+    <div class="brand">LocateME</div>
+
+    <div class="search-wrapper">
+      <div class="search-container">
+        <input
+          id="searchInput"
+          type="text"
+          placeholder="Search places"
+          autocomplete="off"
+        />
+        <button id="searchBtn">🔍</button>
+      </div>
+
+      <div id="suggestions" class="suggestions hidden"></div>
+    </div>
+  </div>
+
+  <!-- CURRENT LOCATION BUTTON (BOTTOM RIGHT) -->
+  <button id="locateBtn" class="locate-btn" title="Current location">
+    ⦿
+  </button>
+
+  <!-- INFO PANEL -->
+  <div class="info-panel hidden" id="infoPanel">
+    <h3 id="placeName"></h3>
+    <p id="address"></p>
+    <p id="distance"></p>
+  </div>
+
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

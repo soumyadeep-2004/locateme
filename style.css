@@ -1,0 +1,157 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "Poppins", sans-serif;
+  overflow: hidden;
+}
+
+/* MAP */
+#map {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+}
+
+/* MOVE + / - TO BOTTOM LEFT */
+.leaflet-control-zoom {
+  bottom: 20px !important;
+  left: 20px !important;
+  top: auto !important;
+}
+
+/* TOP LEFT CONTAINER */
+.top-left {
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  z-index: 1000;
+}
+
+/* BRAND (20% BIGGER) */
+.brand {
+  font-size: 36px; /* increased */
+  font-weight: 500;
+  margin-bottom: 20px;
+  color: #1f137e8a;
+}
+
+/* SEARCH WRAPPER */
+.search-wrapper {
+  position: relative;
+}
+
+/* SEARCH BAR */
+.search-container {
+  display: flex;
+  align-items: center;
+
+  background: rgba(255,255,255,0.7);
+  backdrop-filter: blur(10px);
+
+  border-radius: 30px;
+  padding: 8px 12px;
+  width: 260px;
+
+  box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+  transition: width 0.3s ease;
+}
+
+/* EXPAND ON HOVER / FOCUS */
+.search-container:hover,
+.search-container:focus-within {
+  width: 380px;
+}
+
+.search-container input {
+  border: none;
+  outline: none;
+  flex: 1;
+  font-size: 14px;
+  background: transparent;
+}
+
+.search-container button {
+  border: none;
+  background: none;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+/* AUTOCOMPLETE CLEAN FIX */
+.suggestions {
+  position: absolute;
+  top: 52px;
+  left: 0;
+
+  width: 100%;
+  max-height: 220px;
+  overflow-y: auto;
+
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.3);
+  z-index: 1000;
+}
+
+.suggestions div {
+  padding: 10px 14px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.suggestions div:hover {
+  background: #f1f3f4;
+}
+
+.hidden {
+  display: none;
+}
+
+/* CURRENT LOCATION BUTTON */
+.locate-btn {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 1000;
+
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: none;
+
+  background: white;
+  font-size: 22px;
+  cursor: pointer;
+
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+/* INFO PANEL */
+.info-panel {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+
+  width: 90%;
+  max-width: 420px;
+
+  background: rgba(255,255,255,0.7);
+  backdrop-filter: blur(12px);
+  border-radius: 16px;
+  padding: 14px;
+
+  box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+}
+.leaflet-control-zoom {
+  display: none !important;
+}
+
+html, body {
+  height: 100%;
+  overscroll-behavior: none;
+}
