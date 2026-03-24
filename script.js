@@ -1,30 +1,69 @@
+/* =========================
+   MAP INITIALIZATION
+========================= */
+const map = L.map("map", {
+  zoomControl: false
+}).setView([20.5937, 78.9629], 5);
 
-/* MAP INIT */
-const map = L.map("map").setView([20.5937, 78.9629], 5);
 
-L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-  attribution: "© OpenStreetMap"
-}).addTo(map);
+/* =========================
+   TILE LAYERS
+========================= */
 
-/* STATE */
+// Default OpenStreetMap
+const osm = L.tileLayer(
+  "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+  { attribution: "© OpenStreetMap" }
+);
+
+// Transport Map (better streets, requires API key)
+const transport = L.tileLayer(
+  "https://{s}.tile.thunderforest.com/transport/{z}/{x}/{y}.png?apikey=apikey=1bd6f58614f44d95a63cdcc9c8e5844a",
+  { attribution: "© Thunderforest, © OpenStreetMap" }
+);
+
+// Terrain Map
+const terrain = L.tileLayer(
+  "https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png",
+  { attribution: "© OpenTopoMap", maxZoom: 17 }
+);
+
+// Default layer
+osm.addTo(map);
+
+// Layer object
+const layers = {
+  osm,
+  transport,
+  terrain
+};
+
+
+/* =========================
+   LAYER SWITCHING
+========================= */
+document.querySelectorAll(".map-modes button").forEach(btn => {
+  btn.onclick = () => {
+    Object.values(layers).forEach(layer => map.removeLayer(layer));
+    layers[btn.dataset.layer].addTo(map);
+  };
+});
+
+
+/* =========================
+   STATE VARIABLES
+========================= */
 let userCoords = null;
 let userMarker = null;
 let destMarker = null;
 let routeLine = null;
 
-/* UI */
-const searchInput = document.getElementById("searchInput");
-const searchBtn = document.getElementById("searchBtn");
-const suggestions = document.getElementById("suggestions");
 
-const infoPanel = document.getElementById("infoPanel");
-const placeNameEl = document.getElementById("placeName");
-const addressEl = document.getElementById("address");
-const distanceEl = document.getElementById("distance");
-
-/* ALWAYS SHOW USER LOCATION */
-document.getElementById("locateBtn").addEventListener("click", () => {
-  navigator.geolocation.getCurrentPosition((pos) => {
+/* =========================
+   CURRENT LOCATION
+========================= */
+document.getElementById("locateBtn").onclick = () => {
+  navigator.geolocation.getCurrentPosition(pos => {
     const lat = pos.coords.latitude;
     const lng = pos.coords.longitude;
 
@@ -38,87 +77,101 @@ document.getElementById("locateBtn").addEventListener("click", () => {
 
     map.setView(userCoords, 14);
   });
-});
+};
 
-/* AUTOCOMPLETE */
-searchInput.addEventListener("input", async () => {
-  const q = searchInput.value.trim();
-  if (q.length < 3) {
-    suggestions.classList.add("hidden");
-    return;
+
+/* =========================
+   SEARCH + ROUTING
+========================= */
+document.getElementById("searchBtn").onclick = async () => {
+  const query = document.getElementById("searchInput").value.trim();
+  if (!query) return;
+
+  try {
+    // 1️⃣ SEARCH PLACE (Nominatim)
+    const res = await fetch(
+      `https://nominatim.openstreetmap.org/search?format=json&q=${query}`
+    );
+    const data = await res.json();
+
+    if (!data.length) {
+      alert("Place not found");
+      return;
+    }
+
+    const lat = parseFloat(data[0].lat);
+    const lon = parseFloat(data[0].lon);
+
+    // Remove old markers/routes
+    if (destMarker) map.removeLayer(destMarker);
+    if (routeLine) map.removeLayer(routeLine);
+
+    // Add destination marker
+    destMarker = L.marker([lat, lon])
+      .addTo(map)
+      .bindPopup(data[0].display_name);
+
+    map.setView([lat, lon], 14);
+
+    // 2️⃣ REAL ROUTING (OSRM)
+    if (userCoords) {
+      const routeRes = await fetch(
+        `https://router.project-osrm.org/route/v1/driving/${userCoords[1]},${userCoords[0]};${lon},${lat}?overview=full&geometries=geojson`
+      );
+
+      const routeData = await routeRes.json();
+
+      if (!routeData.routes || !routeData.routes.length) {
+        alert("Route not found");
+        return;
+      }
+
+      // Convert coordinates
+      const routeCoords = routeData.routes[0].geometry.coordinates.map(coord => [
+        coord[1],
+        coord[0]
+      ]);
+
+      // Draw route
+      routeLine = L.polyline(routeCoords, {
+        color: "blue",
+        weight: 5
+      }).addTo(map);
+
+      // Fit map to route
+      map.fitBounds(routeLine.getBounds());
+
+      // Optional: distance & time
+      const distance = routeData.routes[0].distance / 1000;
+      const duration = routeData.routes[0].duration / 60;
+
+      console.log(`Distance: ${distance.toFixed(2)} km`);
+      console.log(`Time: ${duration.toFixed(0)} min`);
+    } else {
+      alert("Please click locate button first");
+    }
+
+  } catch (error) {
+    console.error(error);
+    alert("Something went wrong");
   }
+};
 
-  let url = `https://nominatim.openstreetmap.org/search?format=json&q=${q}`;
 
-  if (userCoords) {
-    url += `&lat=${userCoords[0]}&lon=${userCoords[1]}`;
-  }
+/* =========================
+   HAMBURGER MENU
+========================= */
+const hamburgerBtn = document.getElementById("hamburgerBtn");
+const sideMenu = document.getElementById("sideMenu");
 
-  const res = await fetch(url);
-  const data = await res.json();
+hamburgerBtn.onclick = () => {
+  sideMenu.classList.toggle("hidden");
+};
 
-  suggestions.innerHTML = "";
-  data.slice(0, 5).forEach(place => {
-    const div = document.createElement("div");
-    div.textContent = place.display_name;
-    div.onclick = () => selectPlace(place);
-    suggestions.appendChild(div);
-  });
 
-  suggestions.classList.remove("hidden");
-});
-
-/* SEARCH BUTTON */
-searchBtn.addEventListener("click", () => {
-  if (suggestions.firstChild) suggestions.firstChild.click();
-});
-
-/* PLACE SELECT */
-function selectPlace(place) {
-  suggestions.classList.add("hidden");
-
-  const lat = parseFloat(place.lat);
-  const lon = parseFloat(place.lon);
-
-  if (destMarker) map.removeLayer(destMarker);
-  if (routeLine) map.removeLayer(routeLine);
-
-  destMarker = L.marker([lat, lon]).addTo(map);
-  map.setView([lat, lon], 14);
-
-  placeNameEl.innerText = place.display_name.split(",")[0];
-  addressEl.innerText = place.display_name;
-
-  if (userCoords) {
-    routeLine = L.polyline(
-      [userCoords, [lat, lon]],
-      { color: "red", weight: 4 }
-    ).addTo(map);
-
-    distanceEl.innerText =
-      `📏 ${getDistance(userCoords[0], userCoords[1], lat, lon)} km`;
-  } else {
-    distanceEl.innerText = "📏 Locate yourself first";
-  }
-
-  infoPanel.classList.remove("hidden");
-}
-
-/* DISTANCE */
-function getDistance(lat1, lon1, lat2, lon2) {
-  const R = 6371;
-  const dLat = (lat2 - lat1) * Math.PI / 180;
-  const dLon = (lon2 - lon1) * Math.PI / 180;
-
-  const a =
-    Math.sin(dLat / 2) ** 2 +
-    Math.cos(lat1 * Math.PI / 180) *
-    Math.cos(lat2 * Math.PI / 180) *
-    Math.sin(dLon / 2) ** 2;
-
-  return (R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))).toFixed(2);
-}
-// Fix map rendering on mobile resize
+/* =========================
+   MOBILE FIX (VERY IMPORTANT)
+========================= */
 window.addEventListener("resize", () => {
   setTimeout(() => {
     map.invalidateSize();
