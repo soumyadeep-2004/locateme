@@ -164,9 +164,20 @@ document.getElementById("searchBtn").onclick = async () => {
 const hamburgerBtn = document.getElementById("hamburgerBtn");
 const sideMenu = document.getElementById("sideMenu");
 
-hamburgerBtn.onclick = () => {
+hamburgerBtn.addEventListener("click", (e) => {
+  e.stopPropagation(); // prevent auto close
   sideMenu.classList.toggle("hidden");
-};
+});
+
+// close when clicking outside
+document.addEventListener("click", () => {
+  sideMenu.classList.add("hidden");
+});
+
+// prevent closing when clicking inside menu
+sideMenu.addEventListener("click", (e) => {
+  e.stopPropagation();
+});
 
 
 /* =========================
