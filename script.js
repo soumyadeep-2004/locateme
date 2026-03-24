@@ -5,7 +5,24 @@ const map = L.map("map", {
   zoomControl: false
 }).setView([20.5937, 78.9629], 5);
 
+// AUTO GET USER LOCATION ON LOAD
+navigator.geolocation.getCurrentPosition(
+  (pos) => {
+    const lat = pos.coords.latitude;
+    const lng = pos.coords.longitude;
 
+    userCoords = [lat, lng];
+
+    userMarker = L.marker(userCoords)
+      .addTo(map)
+      .bindPopup("You are here");
+
+    map.setView(userCoords, 14);
+  },
+  (err) => {
+    console.warn("Location permission denied");
+  }
+);
 /* =========================
    TILE LAYERS
 ========================= */
