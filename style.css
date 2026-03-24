@@ -8,6 +8,10 @@ body {
   overflow: hidden;
 }
 
+.side-menu {
+  z-index: 2000; /* MUST be above map */
+}
+
 /* MAP */
 #map {
   position: fixed;
