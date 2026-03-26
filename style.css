@@ -68,7 +68,9 @@ body {
 .search-container:focus-within {
   width: 380px;
 }
-
+.search-wrapper {
+  width: fit-content;
+}
 .search-container input {
   border: none;
   outline: none;
@@ -87,17 +89,20 @@ body {
 /* AUTOCOMPLETE CLEAN FIX */
 .suggestions {
   position: absolute;
-  top: 52px;
+  top: 100%;        /* 🔥 always below input */
   left: 0;
-
   width: 100%;
+
+  margin-top: 6px;  /* small gap */
+
   max-height: 220px;
   overflow-y: auto;
 
   background: white;
   border-radius: 12px;
   box-shadow: 0 6px 18px rgba(0,0,0,0.3);
-  z-index: 1000;
+
+  z-index: 3000;    /* above everything */
 }
 
 .suggestions div {
