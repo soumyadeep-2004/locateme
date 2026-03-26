@@ -1,6 +1,20 @@
 /* =========================
    MAP INITIALIZATION
 ========================= */
+
+document.addEventListener("click", (e) => {
+  if (!e.target.closest(".search-wrapper")) {
+    document.getElementById("suggestions").classList.add("hidden");
+  }
+});
+
+document.getElementById("searchInput").addEventListener("keydown", (e) => {
+  if (e.key === "Enter") {
+    const first = document.querySelector("#suggestions div");
+    if (first) first.click();
+  }
+});
+
 const map = L.map("map", {
   zoomControl: false
 }).setView([20.5937, 78.9629], 5);
