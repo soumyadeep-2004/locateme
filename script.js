@@ -2,6 +2,7 @@
    MAP INITIALIZATION
 ========================= */
 
+
 document.addEventListener("click", (e) => {
   if (!e.target.closest(".search-wrapper")) {
     document.getElementById("suggestions").classList.add("hidden");
@@ -218,4 +219,68 @@ window.addEventListener("resize", () => {
   setTimeout(() => {
     map.invalidateSize();
   }, 300);
+});
+
+const input = document.getElementById("searchInput");
+const suggestionsBox = document.getElementById("suggestions");
+
+input.addEventListener("input", async () => {
+  const query = input.value.trim();
+
+  console.log("Typing:", query); // 🔥 DEBUG
+
+  if (query.length < 2) {
+    suggestionsBox.classList.add("hidden");
+    return;
+  }
+
+  try {
+    const res = await fetch(
+      `https://nominatim.openstreetmap.org/search?format=json&q=${query}`
+    );
+
+    const data = await res.json();
+
+    console.log("Results:", data); // 🔥 DEBUG
+
+    suggestionsBox.innerHTML = "";
+
+    if (!data.length) {
+      suggestionsBox.innerHTML = `<div>No results found</div>`;
+      suggestionsBox.classList.remove("hidden");
+      return;
+    }
+
+    data.slice(0, 5).forEach(place => {
+      const div = document.createElement("div");
+      div.textContent = place.display_name;
+
+      div.onclick = () => {
+        console.log("Clicked:", place);
+
+        const lat = parseFloat(place.lat);
+        const lon = parseFloat(place.lon);
+
+        suggestionsBox.classList.add("hidden");
+        input.value = place.display_name;
+
+        if (destMarker) map.removeLayer(destMarker);
+        if (routeLine) map.removeLayer(routeLine);
+
+        destMarker = L.marker([lat, lon]).addTo(map);
+        map.setView([lat, lon], 14);
+
+        if (userCoords) {
+          fetchRoute(lat, lon);
+        }
+      };
+
+      suggestionsBox.appendChild(div);
+    });
+
+    suggestionsBox.classList.remove("hidden");
+
+  } catch (err) {
+    console.error("Fetch error:", err);
+  }
 });
