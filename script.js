@@ -97,6 +97,7 @@ input.addEventListener("input", async () => {
    SELECT PLACE
 ========================= */
 function selectPlace(place) {
+   document.getElementById("placeName").textContent = place.display_name;
   const lat = parseFloat(place.lat);
   const lon = parseFloat(place.lon);
 
