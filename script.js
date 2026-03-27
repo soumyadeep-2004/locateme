@@ -128,7 +128,12 @@ async function fetchRoute(lat, lon) {
 
   if (!data.routes || data.routes.length === 0) return;
 
-  const coords = data.routes[0].geometry.coordinates.map(c => [c[1], c[0]]);
+  const route = data.routes[0];
+
+  // DRAW ROUTE
+  const coords = route.geometry.coordinates.map(c => [c[1], c[0]]);
+
+  if (routeLine) map.removeLayer(routeLine); // clean old route
 
   routeLine = L.polyline(coords, {
     color: "blue",
@@ -136,8 +141,24 @@ async function fetchRoute(lat, lon) {
   }).addTo(map);
 
   map.fitBounds(routeLine.getBounds());
-}
 
+  // 📏 CALCULATE DISTANCE + TIME
+  const distanceKm = (route.distance / 1000).toFixed(1);
+  const durationMin = Math.round(route.duration / 60);
+
+  // 🎯 UPDATE UI PANEL
+  const infoPanel = document.getElementById("infoPanel");
+  const placeName = document.getElementById("placeName");
+  const address = document.getElementById("address");
+  const distanceText = document.getElementById("distance");
+
+  placeName.textContent = "📍 Destination";
+  address.textContent = "📏 Distance: " + distanceKm + " km";
+  distanceText.textContent = "⏱️ Time: " + durationMin + " mins";
+
+  // SHOW PANEL
+  infoPanel.classList.remove("hidden");
+}
 /* =========================
    CLICK OUTSIDE CLOSE
 ========================= */
