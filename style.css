@@ -8,6 +8,9 @@ body {
   overflow: hidden;
 }
 
+.info-panel {
+  transition: all 0.3s ease;
+}
 .side-menu {
   z-index: 2000; /* MUST be above map */
 }
