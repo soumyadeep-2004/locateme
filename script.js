@@ -45,6 +45,33 @@ document.getElementById("locateBtn").onclick = () => {
   }
 };
 
+const profileIcon = document.getElementById("profileIcon");
+const profileMenu = document.getElementById("profileMenu");
+
+// TOGGLE MENU
+profileIcon.onclick = (e) => {
+  e.stopPropagation();
+  profileMenu.classList.toggle("hidden");
+};
+
+// CLOSE WHEN CLICK OUTSIDE
+document.addEventListener("click", () => {
+  profileMenu.classList.add("hidden");
+});
+
+// NAVIGATION
+function openLogin() {
+  window.location.href = "login.html";
+}
+
+function openProfile() {
+  alert("Profile page coming soon");
+}
+
+function logout() {
+  alert("Logout logic later");
+}
+
 /* =========================
    SEARCH DROPDOWN (MAIN FIX)
 ========================= */
