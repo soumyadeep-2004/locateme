@@ -15,6 +15,53 @@ body {
   z-index: 2000; /* MUST be above map */
 }
 
+/* TOP RIGHT */
+.top-right {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 2000;
+}
+
+/* ICON */
+.profile-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  font-size: 18px;
+}
+
+/* DROPDOWN */
+.profile-menu {
+  margin-top: 10px;
+  background: white;
+  border-radius: 10px;
+  padding: 10px;
+  width: 160px;
+
+  box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+}
+
+.profile-menu button {
+  width: 100%;
+  border: none;
+  background: none;
+  padding: 8px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.profile-menu button:hover {
+  background: #f2f2f2;
+}
+
 /* MAP */
 #map {
   position: fixed;
